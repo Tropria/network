@@ -4,7 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct Msg {
+	int dx;
+	int dy;
+	int isJ;//isJ is bool type 0 1
+} Msg;
+
 void ErrorHandling(char* message);
+void GetCharArray(Msg msg); 
+
 
 int main(int argc, char* argv[])
 {
@@ -43,7 +51,14 @@ int main(int argc, char* argv[])
 		ErrorHandling("read() error!");
 	}
 	printf("Message from server: %s \n", message);
+	while (1) {
+		//try to send msg to server
+		char sendmsg[100];
+		printf("Enter a value :");
+		gets(sendmsg);
 
+		send(hSocket, sendmsg, sizeof(sendmsg), 0);
+	}
 	closesocket(hSocket);
 	if (WSACleanup() == SOCKET_ERROR) {
 		ErrorHandling("WSACleanup() error!");

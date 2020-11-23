@@ -7,8 +7,8 @@ void ErrorHandling(char* message);
 int main(int argc, char *argv[]) 
 {
 	WSADATA wsaData;
-	SOCKET hServSock, hClntSock;
-	SOCKADDR_IN servAddr, clntAddr;
+	SOCKET hServSock, hClntSock[2];
+	SOCKADDR_IN servAddr, clntAddr[2];
 
 	int szClntAddr;
 	char message[] = "Hello World!";
@@ -40,15 +40,26 @@ int main(int argc, char *argv[])
 	}
 
 	printf("Start listening on port %s \n", argv[1]);
-	szClntAddr = sizeof(clntAddr);
-	hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &szClntAddr);
-	if (hClntSock == INVALID_SOCKET)
-		ErrorHandling("accept() error");
+	for (int i = 0; i < 2; ++i) {
+		szClntAddr = sizeof(clntAddr[i]);
+		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAddr[i], &szClntAddr);
+		if (hClntSock[i] == INVALID_SOCKET)
+			ErrorHandling("accept() error");
 
-	printf("clntAddr is : 0x%x\n", clntAddr.sin_addr.s_addr);
+		printf("clntAddr is : 0x%x\n", clntAddr[i].sin_addr.s_addr);
 
-	send(hClntSock, message, sizeof(message), 0);
-	closesocket(hClntSock);
+		send(hClntSock[i], message, sizeof(message), 0);
+		while (1) {
+			char buff[30];
+			int strLen = recv(hClntSock[i], buff, sizeof(buff) - 1, 0);
+			if (strLen == -1) {
+				ErrorHandling("read() error!");
+			}
+			printf("Message from server: %s \n", buff);
+		}
+		closesocket(hClntSock[i]);
+
+	}
 	closesocket(hServSock);
 
 	if (WSACleanup() == SOCKET_ERROR) {
