@@ -11,7 +11,7 @@ typedef struct Msg {
 } Msg;
 
 void ErrorHandling(char* message);
-void GetCharArray(Msg msg); 
+char* GetCharArray(char* buf, Msg msg); 
 
 
 int main(int argc, char* argv[])
@@ -57,7 +57,13 @@ int main(int argc, char* argv[])
 		printf("Enter a value :");
 		gets(sendmsg);
 
+		
 		send(hSocket, sendmsg, sizeof(sendmsg), 0);
+		
+		char recvBuff[30];
+		recv(hSocket, recvBuff, sizeof(recvBuff) - 1, 0);
+		printf("Get a recvMsg : %s \n", recvBuff);
+		if (sendmsg[0] == '0') break;
 	}
 	closesocket(hSocket);
 	if (WSACleanup() == SOCKET_ERROR) {

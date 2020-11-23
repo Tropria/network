@@ -55,7 +55,9 @@ int main(int argc, char *argv[])
 			if (strLen == -1) {
 				ErrorHandling("read() error!");
 			}
-			printf("Message from server: %s \n", buff);
+			printf("Message from client: %s \n", buff);
+			send(hClntSock[i], buff, sizeof(buff), 0);
+			if (buff[0] == '0') break;
 		}
 		closesocket(hClntSock[i]);
 
